@@ -7,5 +7,4 @@ package com.sparrow.remote.client;
 public class GrpcClientFactory {
 
 
-
 }

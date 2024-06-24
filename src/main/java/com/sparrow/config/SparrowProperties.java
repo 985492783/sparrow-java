@@ -9,4 +9,10 @@ import java.util.Properties;
 public class SparrowProperties extends Properties {
 
 
+    public SparrowProperties(Properties properties) {
+        this.putAll(properties);
+    }
+    public SparrowProperties() {
+
+    }
 }

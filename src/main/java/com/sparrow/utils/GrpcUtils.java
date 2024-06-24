@@ -7,6 +7,7 @@ import com.google.protobuf.UnsafeByteOperations;
 import com.sparrow.common.ErrorCodeEnums;
 import com.sparrow.common.Request;
 import com.sparrow.common.Response;
+import com.sparrow.config.Constants;
 import com.sparrow.exception.SparrowException;
 import com.sparrow.remote.auto.Metadata;
 import com.sparrow.remote.auto.Payload;
@@ -48,7 +49,10 @@ public class GrpcUtils {
         }
         ByteString byteString = payload.getBody().getValue();
         byte[] bytes = byteString.toByteArray();
-        return (Response)JSON.parseObject(bytes, aClass);
+        Response response = (Response) JSON.parseObject(bytes, aClass);
+        int statusCode = Integer.parseInt(payload.getMetadata().getHeadersOrDefault(Constants.STATUS_CODE, "400"));
+        response.setStatusCode(statusCode);
+        return response;
     }
     
 }

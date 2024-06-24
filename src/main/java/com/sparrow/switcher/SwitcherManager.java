@@ -4,13 +4,18 @@ import com.alibaba.fastjson2.JSON;
 import com.sparrow.annotation.AppSwitch;
 import com.sparrow.common.AppSwitcherItem;
 import com.sparrow.common.ErrorCodeEnums;
+import com.sparrow.config.Constants;
+import com.sparrow.config.SparrowProperties;
 import com.sparrow.exception.SparrowException;
+import com.sparrow.remote.client.GrpcClientFactory;
+import com.sparrow.switcher.payload.SwitcherResponse;
 import com.sparrow.utils.SwitcherFieldUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -20,7 +25,12 @@ import java.util.concurrent.ConcurrentHashMap;
 public class SwitcherManager {
     
     private static final Map<Class<?>, Map<String, Field>> fieldMap = new ConcurrentHashMap<>();
-    
+
+    private static volatile SwitcherService switcherService;
+    private static volatile boolean isStart = false;
+
+    private static String appName = null;
+    private static String namespace = null;
     /**
      * client register method.
      *
@@ -62,10 +72,27 @@ public class SwitcherManager {
             fieldMap.put(clazz, map);
             clazzMap.put(clazz.getCanonicalName(), fieldItemMap);
         }
-        
+
+        SwitcherResponse response = switcherService.registry(namespace, appName, clazzMap);
+        System.out.println(JSON.toJSON(response));
         //TODO 注册并将初始化值拉回来
         
         //TODO 将真实值透还给原对象 SwitcherFieldUtils.setField()
     }
-    
+
+    public static void initManager(Properties properties) {
+        if (isStart) {
+            return;
+        }
+        synchronized (SwitcherManager.class) {
+            if (isStart) {
+                return;
+            }
+            switcherService = new SparrowSwitcherService(new SparrowProperties(properties));
+            appName = properties.getProperty(Constants.SPARROW_APP_NAME, Constants.DEFAULT_SPARROW_APP_NAME);
+            namespace = properties.getProperty(Constants.SPARROW_NAMESPACE, Constants.DEFAULT_SPARROW_NAMESPACE);
+            isStart = true;
+        }
+
+    }
 }

@@ -7,9 +7,10 @@ import com.sparrow.common.Response;
  * @date 2024/6/15 5:36
  */
 public class SwitcherResponse extends Response {
-    
+    private String resp;
+
     @Override
     public String getType() {
-        return null;
+        return "center.SwitcherResponse";
     }
 }

@@ -6,4 +6,12 @@ package com.sparrow.common;
  */
 public abstract class Response implements Payload {
 
+    private int statusCode;
+
+    public void setStatusCode(int statusCode) {
+        this.statusCode = statusCode;
+    }
+    public int getStatusCode() {
+        return statusCode;
+    }
 }
