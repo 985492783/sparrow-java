@@ -51,7 +51,9 @@ public class GrpcUtils {
         byte[] bytes = byteString.toByteArray();
         Response response = (Response) JSON.parseObject(bytes, aClass);
         int statusCode = Integer.parseInt(payload.getMetadata().getHeadersOrDefault(Constants.STATUS_CODE, "400"));
+        String errorMsg = payload.getMetadata().getHeadersOrDefault(Constants.STATUS_ERR, "");
         response.setStatusCode(statusCode);
+        response.setErrMsg(errorMsg);
         return response;
     }
     

@@ -1,6 +1,7 @@
 package com.sparrow.switcher;
 
 import com.sparrow.annotation.AppSwitch;
+import com.sparrow.config.Constants;
 import com.sparrow.config.SparrowProperties;
 import com.sparrow.exception.SparrowException;
 import lombok.Data;
@@ -19,7 +20,7 @@ import java.util.Scanner;
 public class SparrowSwitcherServiceTest {
 
     @Test
-    public void testGrpc() {
+    public void testGrpc() throws SparrowException {
         SparrowProperties properties = new SparrowProperties();
         SparrowSwitcherService service = new SparrowSwitcherService(properties);
         Scanner scanner = new Scanner(System.in);
@@ -28,6 +29,9 @@ public class SparrowSwitcherServiceTest {
     @Test
     public void testProperties() throws SparrowException {
         Properties properties = System.getProperties();
+        properties.put(Constants.SPARROW_APP_NAME, "test");
+        properties.put(Constants.SPARROW_NAMESPACE, "public");
+        properties.put(Constants.SPARROW_GRPC_ADDR, "127.0.0.1:9854");
         SwitcherManager.initManager(properties);
         Node node = new Node();
         SwitcherManager.init(node.getClass());

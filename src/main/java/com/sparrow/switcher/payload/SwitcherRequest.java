@@ -28,7 +28,7 @@ public class SwitcherRequest extends Request {
 
     @Override
     public String getType() {
-        return "center.SwitcherRequest";
+        return "handler.SwitcherRequest";
     }
     
     @Override

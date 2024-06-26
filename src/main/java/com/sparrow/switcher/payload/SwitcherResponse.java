@@ -11,6 +11,6 @@ public class SwitcherResponse extends Response {
 
     @Override
     public String getType() {
-        return "center.SwitcherResponse";
+        return "handler.SwitcherResponse";
     }
 }

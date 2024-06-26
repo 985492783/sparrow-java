@@ -20,6 +20,8 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import static com.sparrow.config.Constants.*;
 
@@ -38,17 +40,19 @@ public class SparrowSwitcherService extends BiRequestStreamGrpc.BiRequestStreamI
 
     private final SparrowProperties properties;
     
-    public SparrowSwitcherService(SparrowProperties properties) {
+    public SparrowSwitcherService(SparrowProperties properties) throws SparrowException {
         String addr = (String) properties.getOrDefault(SPARROW_GRPC_ADDR, DEFAULT_SPARROW_GRPC_ADDR);
         ManagedChannel channel = ManagedChannelBuilder.forTarget(addr).usePlaintext().build();
         this.properties = properties;
         this.blockingStub = RequestGrpc.newBlockingStub(channel);
         this.streamStub = BiRequestStreamGrpc.newStub(channel);
+        CountDownLatch latch = new CountDownLatch(1);
         io.grpc.stub.StreamObserver<com.sparrow.remote.auto.Payload> observer = this.streamStub.requestBiStream(
                 new StreamObserver<Payload>() {
                     @Override
                     public void onNext(Payload value) {
                         System.out.println(value);
+                        latch.countDown();
                     }
                     
                     @Override
@@ -58,11 +62,15 @@ public class SparrowSwitcherService extends BiRequestStreamGrpc.BiRequestStreamI
                     
                     @Override
                     public void onCompleted() {
-
                     }
                 });
-
         observer.onNext(GrpcUtils.convert(new RegistryRequest(clientId)));
+        try {
+            latch.await(10_000, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            throw new SparrowException(300, "registry error");
+        }
+        log.info("register success");
     }
 
     @Override
@@ -74,6 +82,9 @@ public class SparrowSwitcherService extends BiRequestStreamGrpc.BiRequestStreamI
 
         Payload payload = this.blockingStub.request(GrpcUtils.convert(switcherRequest));
         Response response = GrpcUtils.Parser(payload);
+        if (response.getStatusCode() != 200) {
+            throw new SparrowException(301, "registry response error, status code is " + response.getStatusCode());
+        }
         if (response.getClass() != SwitcherResponse.class) {
             throw new SparrowException(301, "registry response error, response class is not ");
         }
@@ -101,22 +112,31 @@ public class SparrowSwitcherService extends BiRequestStreamGrpc.BiRequestStreamI
         public Map<String, String> getHeaders() {
             return new HashMap<>();
         }
-    
+
         public String getClientId() {
             return clientId;
         }
-    
+
         public void setClientId(String clientId) {
             this.clientId = clientId;
         }
-    
+
         public String getIp() {
             return ip;
         }
-    
+
         public void setIp(String ip) {
             this.ip = ip;
         }
     }
+
+    private static class RegistryResponse extends Response {
+
+        @Override
+        public String getType() {
+            return "server.RegistryResponse";
+        }
+    }
+
     
 }

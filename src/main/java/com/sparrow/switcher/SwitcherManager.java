@@ -80,7 +80,7 @@ public class SwitcherManager {
         //TODO 将真实值透还给原对象 SwitcherFieldUtils.setField()
     }
 
-    public static void initManager(Properties properties) {
+    public static void initManager(Properties properties) throws SparrowException {
         if (isStart) {
             return;
         }

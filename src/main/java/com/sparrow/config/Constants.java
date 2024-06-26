@@ -14,9 +14,11 @@ public class Constants {
     public static final String DEFAULT_SPARROW_APP_NAME = "sparrow_java";
 
     public static final String SPARROW_NAMESPACE = "sparrow.namespace";
-    public static final String DEFAULT_SPARROW_NAMESPACE= "default";
+    public static final String DEFAULT_SPARROW_NAMESPACE= "public";
+
 
 
     public static final String SPARROW_SWITCHER_REGISTRY = "registry";
     public static final String STATUS_CODE = "StatusCode";
+    public static final String STATUS_ERR = "Error";
 }
