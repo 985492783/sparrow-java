@@ -59,7 +59,11 @@ public class SwitcherManager {
                     try {
                         Object obj = field.get(null);
                         if (obj != null) {
-                            switchItem.setValue(JSON.toJSONString(obj));
+                            if (switchItem.isJson()) {
+                                switchItem.setValue(JSON.toJSONString(obj));
+                            } else {
+                                switchItem.setValue(obj);
+                            }
                         }
                     } catch (IllegalAccessException e) {
                         throw new SparrowException(ErrorCodeEnums.SYSTEM_ERROR.getCode(),

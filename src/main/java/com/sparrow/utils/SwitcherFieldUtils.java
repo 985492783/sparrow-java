@@ -19,7 +19,7 @@ public class SwitcherFieldUtils {
         if (field.getType() == Integer.class || field.getType() == Long.class) {
             switchItem.setType("int");
         } else if (field.getType() == Double.class || field.getType() == Float.class) {
-            switchItem.setType("float64");
+            switchItem.setType("float");
         } else if (field.getType() == Boolean.class) {
             switchItem.setType("bool");
         } else if (field.getType() == String.class) {

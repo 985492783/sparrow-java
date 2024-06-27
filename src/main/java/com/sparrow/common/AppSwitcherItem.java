@@ -12,7 +12,7 @@ public class AppSwitcherItem {
     
     private String desc;
     
-    private String value;
+    private Object value;
     
     public String getFieldName() {
         return fieldName;
@@ -38,11 +38,15 @@ public class AppSwitcherItem {
         this.desc = desc;
     }
     
-    public String getValue() {
+    public Object getValue() {
         return value;
     }
     
-    public void setValue(String value) {
+    public void setValue(Object value) {
         this.value = value;
+    }
+
+    public boolean isJson() {
+        return "json".equals(type);
     }
 }
