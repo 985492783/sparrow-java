@@ -33,10 +33,14 @@ public class SwitcherFieldUtils {
     /**
      * json数值赋给field
      */
-    public static void setField(Field field, String json) throws SparrowException {
+    public static void setField(Field field, Object object, String type) throws SparrowException {
         try {
-            Type genericType = field.getGenericType();
-            field.set(null, JSON.parseObject(json, genericType));
+            if (type.equals("json")) {
+                Type genericType = field.getGenericType();
+                field.set(null, JSON.parseObject(object.toString(), genericType));
+            } else {
+                field.set(null, object);
+            }
         } catch (Exception e) {
             throw new SparrowException(ErrorCodeEnums.SYSTEM_ERROR.getCode(), "parse object failed");
         }

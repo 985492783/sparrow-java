@@ -33,8 +33,9 @@ public class SparrowSwitcherServiceTest {
         properties.put(Constants.SPARROW_NAMESPACE, "public");
         properties.put(Constants.SPARROW_GRPC_ADDR, "127.0.0.1:9854");
         SwitcherManager.initManager(properties);
-        Node node = new Node();
-        SwitcherManager.init(node.getClass());
+        System.out.println(Node.name);
+        SwitcherManager.init(Node.class);
+        System.out.println(Node.name);
         Scanner scanner = new Scanner(System.in);
         scanner.next();
     }

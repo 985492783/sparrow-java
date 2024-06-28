@@ -10,6 +10,7 @@ import com.sparrow.exception.SparrowException;
 import com.sparrow.remote.client.GrpcClientFactory;
 import com.sparrow.switcher.payload.SwitcherResponse;
 import com.sparrow.utils.SwitcherFieldUtils;
+import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -22,9 +23,10 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author 985492783@qq.com
  * @date 2024/6/15 2:52
  */
+@Slf4j
 public class SwitcherManager {
     
-    private static final Map<Class<?>, Map<String, Field>> fieldMap = new ConcurrentHashMap<>();
+    private static final Map<String, Map<String, Field>> fieldMap = new ConcurrentHashMap<>();
 
     private static volatile SwitcherService switcherService;
     private static volatile boolean isStart = false;
@@ -73,18 +75,27 @@ public class SwitcherManager {
                     map.put(field.getName(), field);
                 }
             }
-            fieldMap.put(clazz, map);
+            fieldMap.put(clazz.getCanonicalName(), map);
             clazzMap.put(clazz.getCanonicalName(), fieldItemMap);
         }
 
         SwitcherResponse response = switcherService.registry(namespace, appName, clazzMap);
-        System.out.println(JSON.toJSON(response));
-        //TODO 注册并将初始化值拉回来
-        
-        //TODO 将真实值透还给原对象 SwitcherFieldUtils.setField()
+
+        if (response.getClassMap() != null) {
+            response.getClassMap().forEach((k, v)-> {
+                v.forEach((field, item)-> {
+                    try {
+                        SwitcherFieldUtils.setField(fieldMap.get(k).get(field), item.getValue(), item.getType());
+
+                    } catch (SparrowException e) {
+                        log.error("register upload failed");
+                    }
+                });
+            });
+        }
     }
 
-    public static void initManager(Properties properties) throws SparrowException {
+    public static void initManager(Properties properties) {
         if (isStart) {
             return;
         }
@@ -97,6 +108,5 @@ public class SwitcherManager {
             namespace = properties.getProperty(Constants.SPARROW_NAMESPACE, Constants.DEFAULT_SPARROW_NAMESPACE);
             isStart = true;
         }
-
     }
 }

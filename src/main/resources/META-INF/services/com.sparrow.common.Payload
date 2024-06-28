@@ -1,2 +1,3 @@
 com.sparrow.switcher.payload.SwitcherRequest
 com.sparrow.switcher.payload.SwitcherResponse
+com.sparrow.switcher.SparrowSwitcherService$RegistryResponse
